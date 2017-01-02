@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* GET VIDEOS : https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UChf19X-xjHOQAsZx5GbEk3g&maxResults=50&pageToken=CDIQAA&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo&key={YOUR_API_KEY}*/
 /* GET CHANNELS : https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&order=viewCount&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo&key={YOUR_API_KEY}
-/* GET Channel info : https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=UChf19X-xjHOQAsZx5GbEk3g&key= */
+/* GET Channel info : https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=UChf19X-xjHOQAsZx5GbEk3g&key=AIzaSyC3_KwHOzCFaU9om8-O1nTyQQDYqRlSg4Q */
 /* SEARCH for videos : 
 /* SEARCH for channels :
 // Use .toLocaleString('en-US', {minimumFractionDigits: 0}) to format the numbers output to 1,000,000
@@ -63,7 +63,7 @@ function PlayListObj(id, title , desc , pubdate , thumbnail ) {
 /*----------------------------------------------------------------------- functions definitions --------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-//Function to get channel based information, the callback will have the returned channelObj as param
+//Function to get channel based information, the callback will have the returned channelObj as a parameter
 function get_channelInfo(APIKey , channel_id , callBackFunction ){
     $.getJSON( "https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=" + channel_id + "&key=" + APIKey , function(data) {
         /*On success callback*/
@@ -75,7 +75,7 @@ function get_channelInfo(APIKey , channel_id , callBackFunction ){
         callBackFunction(channel);
     });
 }
-/*Function to search for channels, maxresult = max 50, orderBy valid values = viewCount, videoCount, rating, date */
+/*Function to search for channels, maxresult = max 50, orderBy valid values = viewCount, videoCount, rating, date, the callback will contain a channelContainer as parameter */
 function search_channels(APIKey , Keywords , MaxResults, OrderBy , callBackFunction ){
     $.getJSON( "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=" + MaxResults + "&order=" + OrderBy + "&q=" + Keywords + "&type=channel&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo%2CregionCode&key=" + APIKey , function(data) {
         /*On success callback*/
@@ -90,7 +90,7 @@ function search_channels(APIKey , Keywords , MaxResults, OrderBy , callBackFunct
         callBackFunction(channelContainer);
     });
 }
-/*Function to get a channel's playlists max= 50 results*/
+/*Function to get a channel's playlists max= 50 results, the callBackFunction will contain a playlistContainer as parameter */
 function get_playlists(APIKey , channelid , maxResults , callBackFunction ) {
     $.getJSON( "https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=" + channelid + "&maxResults=" + maxResults + "&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo&key=" + APIKey ,
         //callback
@@ -104,7 +104,7 @@ function get_playlists(APIKey , channelid , maxResults , callBackFunction ) {
     });
 }
 
-//Function that gets the videos for a channelid
+//Function that gets the videos for a channelid, callBackFunction will contain a videoObjArray as parameter
 function get_VideosForChannel(APIKey, channel_id, results , callBackFunction , orderBy = "viewCount" ) {
     videoContainer = [];
     var count=0;
@@ -140,7 +140,7 @@ function get_VideosForChannel(APIKey, channel_id, results , callBackFunction , o
         }
     );
 }
-    //Recursive subfunction to retrieve all videos from channel in successive calls
+    //Recursive subfunction to retrieve all videos from channel in successive calls, is part of get_VideosForChannel
     function get_ChannelVideos( videosContainer  , nextPageToken , baseUrl , callBack) {
         if(typeof nextPageToken != "undefined")
         {
@@ -166,7 +166,8 @@ function get_VideosForChannel(APIKey, channel_id, results , callBackFunction , o
             callBack();
         }
     }
-/*Function to retrieve video statistics ex: views , likes , dislikes */
+
+/*Function to retrieve video statistics ex: views , likes , dislikes, callBack will contain VideosArray as parameter*/
 function get_Video_Stats(APIKey, VideosArray , indexCount, callBack )  {
 
     if(indexCount < VideosArray.length)
@@ -201,6 +202,7 @@ function get_Video_Stats(APIKey, VideosArray , indexCount, callBack )  {
     }
 }
 
+//This function retrieves the stats for a given video id, an empty video object is returned with only the stats for the given id
 function get_Video_Stats_SingleVideo(APIKey, videoId , callBackFunction )  {
     $.getJSON( "https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=" + videoId + "&key=" + APIKey ,
         function( data ) {
@@ -214,7 +216,19 @@ function get_Video_Stats_SingleVideo(APIKey, videoId , callBackFunction )  {
     });
 }
 
-/*Function to search for videos, maxresult = max 50, orderBy valid values = viewCount, rating, date, title */
+//This function syncs the stats for a given videoObj
+function sync_Stats_SingleVideo(APIKey, videoObject , callBackFunction )  {
+    $.getJSON( "https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=" + videoObject.id + "&key=" + APIKey ,
+        function( data ) {
+            videoObject.stats.push( { key: 'views', value: Number(data.items[0].statistics.viewCount) });
+            videoObject.stats.push( { key: 'likes', value: Number(data.items[0].statistics.likeCount) });
+            videoObject.stats.push( { key: 'dislikes', value: Number(data.items[0].statistics.dislikeCount) });
+            videoObject.stats.push( { key: 'comments', value: Number(data.items[0].statistics.commentCount) });
+        callBackFunction();
+    });
+}
+
+/*Function to search for videos, maxresult = max 50, orderBy valid values = viewCount, rating, date, title, callBackFunction will contain an Array of videoObj */
 function search_videos(APIKey , Keywords , MaxResults , OrderBy , callBackFunction ){
     
     if( MaxResults > 50 )
