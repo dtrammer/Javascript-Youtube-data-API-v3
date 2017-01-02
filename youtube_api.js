@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* GET VIDEOS : https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UChf19X-xjHOQAsZx5GbEk3g&maxResults=50&pageToken=CDIQAA&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo&key={YOUR_API_KEY}*/
 /* GET CHANNELS : https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&order=viewCount&fields=etag%2Citems%2Ckind%2CnextPageToken%2CpageInfo&key={YOUR_API_KEY}
-/* GET Channel info : https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=UChf19X-xjHOQAsZx5GbEk3g&key=AIzaSyC3_KwHOzCFaU9om8-O1nTyQQDYqRlSg4Q */
+/* GET Channel info : https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=UChf19X-xjHOQAsZx5GbEk3g&key= */
 /* SEARCH for videos : 
 /* SEARCH for channels :
 // Use .toLocaleString('en-US', {minimumFractionDigits: 0}) to format the numbers output to 1,000,000
