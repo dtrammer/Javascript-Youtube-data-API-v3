@@ -7,3 +7,6 @@
 <li>Get video stats based on channel id (single video)</li>
 <li>Get videos stats based on channel id (multiple videos in one request)</li>
 </ul>
+
+<h2>Requires</h2>
+ - JQuery
