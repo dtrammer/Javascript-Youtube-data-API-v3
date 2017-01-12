@@ -10,3 +10,4 @@
 
 <h2>Requires</h2>
  - JQuery
+ - Youtube API key, (you can get this with your google account, through the google development console. Takes 5 minutes)
